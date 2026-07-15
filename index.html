@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>高中物理世界脈動｜教案資料庫</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#2b6cb0;--blue-light:#ebf8ff;--blue-dark:#1a365d;--green:#38a169;--red:#e53e3e;--orange:#dd6b20;--gray:#718096;--bg:#f0f4f8;--white:#fff;--border:#e2e8f0}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:#2d3748;font-size:15px}
+nav{background:linear-gradient(135deg,var(--blue-dark),var(--blue));color:#fff;padding:0 24px}
+.nav-inner{display:flex;align-items:center;max-width:1200px;margin:0 auto}
+.nav-logo{font-size:20px;font-weight:700;padding:16px 0;margin-right:32px;white-space:nowrap}
+.nav-logo span{color:#90cdf4}
+.nav-links{display:flex}
+.nav-link{padding:16px 18px;color:rgba(255,255,255,.75);font-size:14px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}
+.nav-link:hover,.nav-link.active{color:#fff;border-bottom-color:#90cdf4;background:rgba(255,255,255,.1)}
+.nav-spacer{flex:1}
+.nav-status{font-size:12px;padding:6px 12px;border-radius:20px;background:rgba(255,255,255,.15)}
+main{max-width:1200px;margin:0 auto;padding:24px 16px}
+.page{display:none}.page.active{display:block}
+.page-header{margin-bottom:20px}
+.page-header h2{font-size:22px;font-weight:700;color:var(--blue-dark);margin-bottom:4px}
+.page-header p{font-size:14px;color:var(--gray)}
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:20px}
+.lesson-card{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.07);border-left:4px solid var(--blue);cursor:pointer;transition:transform .15s,box-shadow .15s}
+.lesson-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.lesson-card .grade-tag{display:inline-block;background:var(--blue-light);color:var(--blue);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+.lesson-card h3{font-size:16px;font-weight:700;color:var(--blue-dark);margin-bottom:6px;line-height:1.4}
+.lesson-card .chapter{font-size:13px;color:var(--gray);margin-bottom:8px}
+.lesson-card .date{font-size:12px;color:#a0aec0}
+.empty-state{text-align:center;padding:60px 20px;color:var(--gray)}
+.empty-state .icon{font-size:48px;margin-bottom:16px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;overflow-y:auto}
+.modal-overlay.open{display:block}
+.modal{background:var(--white);border-radius:16px;max-width:900px;margin:40px auto;overflow:hidden}
+.modal-header{background:linear-gradient(135deg,var(--blue-dark),var(--blue));color:#fff;padding:20px 24px;display:flex;align-items:center;justify-content:space-between}
+.modal-header h2{font-size:18px;font-weight:700}
+.modal-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;line-height:32px;text-align:center}
+.modal-tabs{display:flex;background:#f7fafc;border-bottom:1px solid var(--border);overflow-x:auto}
+.m-tab{padding:12px 16px;font-size:13px;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}
+.m-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.modal-body{padding:24px;max-height:65vh;overflow-y:auto}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap}
+.section-title{font-size:17px;font-weight:700;color:var(--blue-dark);margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid var(--blue)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.info-item{background:#f7fafc;padding:10px 14px;border-radius:8px}
+.info-item .label{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:4px}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;background:var(--blue-light);color:var(--blue)}
+.tag.green{background:#f0fff4;color:#276749}
+.session-box{border:1px solid var(--border);border-radius:8px;margin:10px 0;overflow:hidden}
+.session-header{background:#edf2f7;padding:10px 16px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.session-num{width:28px;height:28px;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.session-title{flex:1;font-weight:600;color:#2d3748}
+.session-time{font-size:12px;color:var(--gray)}
+.session-body{padding:14px 16px;display:none}
+.session-body.open{display:block}
+.session-body ul{margin-left:18px;line-height:1.8;color:#4a5568;font-size:14px}
+.question-block{border:1px solid var(--border);border-radius:8px;margin:12px 0;padding:14px}
+.question-block.single{border-left:4px solid var(--blue)}
+.question-block.multi{border-left:4px solid var(--red)}
+.question-block.open{border-left:4px solid var(--green)}
+.q-type-tag{font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:6px}
+.q-type-tag.single{color:var(--blue)}.q-type-tag.multi{color:var(--red)}.q-type-tag.open{color:var(--green)}
+.q-subject{font-size:14px;line-height:1.8;color:#2d3748;margin-bottom:8px}
+.choices{margin:6px 0 6px 14px}
+.choice{font-size:13px;color:#4a5568;margin:5px 0}
+.choice strong{color:var(--blue)}
+.answer-btn{background:none;border:1px solid var(--green);color:var(--green);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:inherit;margin-top:8px}
+.answer-box{background:#f0fff4;border:1px solid #c6f6d5;border-radius:6px;padding:10px 14px;margin-top:8px;display:none;font-size:13px;line-height:1.7}
+.answer-box strong{color:#276749}
+.sources-list{margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
+.sources-list h4{font-size:13px;font-weight:700;color:var(--gray);margin-bottom:8px}
+.source-item{font-size:12px;color:#4a5568;margin:4px 0;line-height:1.6}
+.source-item a{color:var(--blue)}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{background:#edf2f7;padding:8px 12px;border:1px solid var(--border);text-align:center;font-weight:600}
+.data-table td{border:1px solid var(--border);padding:8px 12px;text-align:center}
+.data-table tr:nth-child(even) td{background:#f7fafc}
+.inquiry-flow{background:#f7fafc;border-radius:8px;padding:14px;margin:12px 0;font-size:14px;line-height:1.9;color:#4a5568}
+.gen-card{background:var(--white);border-radius:12px;padding:28px;box-shadow:0 2px 8px rgba(0,0,0,.07);max-width:720px}
+.form-group{margin:16px 0}
+.form-group label{display:block;font-size:14px;font-weight:600;color:#4a5568;margin-bottom:6px}
+.form-control{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:#2d3748;transition:border-color .2s}
+.form-control:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(43,108,176,.1)}
+.gen-btn{background:var(--blue);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;display:flex;align-items:center;gap:8px;margin-top:8px}
+.gen-btn:hover{background:var(--blue-dark)}
+.gen-btn:disabled{background:#a0aec0;cursor:not-allowed}
+.status-box{margin-top:20px;padding:16px;border-radius:8px;font-size:14px;display:none}
+.status-box.running{background:#fefcbf;border:1px solid #f6e05e;display:block}
+.status-box.success{background:#f0fff4;border:1px solid #c6f6d5;display:block}
+.status-box.error{background:#fff5f5;border:1px solid #fed7d7;display:block}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #f6e05e;border-top-color:#744210;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.settings-card{background:var(--white);border-radius:12px;padding:28px;box-shadow:0 2px 8px rgba(0,0,0,.07);max-width:600px}
+.settings-card h3{font-size:17px;font-weight:700;color:var(--blue-dark);margin-bottom:4px}
+.settings-card p{font-size:13px;color:var(--gray);margin-bottom:20px;line-height:1.6}
+.save-btn{background:var(--green);color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.save-btn:hover{background:#276749}
+.hint{font-size:12px;color:var(--gray);margin-top:4px;line-height:1.5}
+.hint a{color:var(--blue)}
+.dl-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;transition:all .15s}
+.dl-btn.blue{background:var(--blue);color:#fff}.dl-btn.blue:hover{background:var(--blue-dark)}
+.dl-btn.green{background:var(--green);color:#fff}.dl-btn.green:hover{background:#276749}
+.dl-btn.red{background:var(--red);color:#fff}.dl-btn.red:hover{background:#9b2c2c}
+.dl-btn.orange{background:var(--orange);color:#fff}.dl-btn.orange:hover{background:#c05621}
+.dl-btn.outline{background:var(--white);color:var(--blue);border:2px solid var(--blue)}.dl-btn.outline:hover{background:var(--blue-light)}
+@media(max-width:640px){.info-grid{grid-template-columns:1fr}.lesson-grid{grid-template-columns:1fr}.modal{margin:0;border-radius:0;min-height:100vh}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">⚡ 高中物理<span>世界脈動</span></div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showPage('db')">📚 教案資料庫</button>
+      <button class="nav-link" onclick="showPage('import')">📥 匯入教案</button>
+      <button class="nav-link" onclick="showPage('settings')">⚙️ 設定</button>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-status" id="navStatus">未連線</div>
+  </div>
+</nav>
+
+<main>
+<!-- 教案資料庫 -->
+<div class="page active" id="page-db">
+  <div class="page-header">
+    <h2>📚 教案資料庫</h2>
+    <p>所有累積的高中物理教案，點擊卡片展開完整內容</p>
+  </div>
+  <div class="lesson-grid" id="lessonGrid">
+    <div class="empty-state" id="emptyState">
+      <div class="icon">📂</div>
+      <h3>尚無教案</h3>
+      <p>請先在「設定」填入 GitHub 資訊，<br>再到「匯入教案」新增第一份教案。</p>
+    </div>
+  </div>
+</div>
+
+<!-- 匯入教案 -->
+<div class="page" id="page-import">
+  <div class="page-header">
+    <h2>📥 匯入教案</h2>
+    <p>在 Claude（Cowork）生成教案後，下載 JSON 並上傳到雲端資料庫</p>
+  </div>
+  <div style="background:#ebf8ff;border:1px solid #bee3f8;border-radius:12px;padding:20px;margin-bottom:20px;max-width:720px">
+    <div style="font-weight:700;color:#2b6cb0;margin-bottom:12px">📋 使用流程（完全免費）</div>
+    <div style="font-size:14px;color:#2c5282;line-height:2">
+      <strong>① </strong>在 Claude / Cowork 輸入：<code style="background:#dbeafe;padding:2px 8px;border-radius:4px">幫我做高一第3章教案</code><br>
+      <strong>② </strong>Claude 生成後點擊 <strong>「⬇ 下載 JSON」</strong> 取得 .json 檔案<br>
+      <strong>③ </strong>回到此頁面上傳 JSON → 一鍵存入雲端資料庫
+    </div>
+  </div>
+  <div class="gen-card">
+    <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;width:fit-content">
+      <button id="modeFileBtn" onclick="setImportMode('file')" style="padding:9px 20px;font-size:13px;font-weight:700;background:var(--blue);color:#fff;border:none;cursor:pointer;font-family:inherit">📁 上傳 JSON 檔案</button>
+      <button id="modePasteBtn" onclick="setImportMode('paste')" style="padding:9px 20px;font-size:13px;font-weight:700;background:var(--white);color:var(--gray);border:none;cursor:pointer;font-family:inherit">📋 貼上 JSON 文字</button>
+    </div>
+    <div id="importModeFile">
+      <div class="form-group">
+        <label>選擇教案 JSON 檔案</label>
+        <input type="file" id="jsonFileInput" accept=".json" class="form-control" onchange="handleFileSelect(event)" style="padding:8px">
+      </div>
+      <div id="filePreview" style="display:none;background:#f7fafc;border-radius:8px;padding:12px;font-size:13px;color:#4a5568"></div>
+    </div>
+    <div id="importModePaste" style="display:none">
+      <div class="form-group">
+        <label>貼入教案 JSON 內容</label>
+        <textarea id="jsonPasteArea" class="form-control" rows="8" placeholder='{"meta":{"grade":"高一",...}}' style="font-family:monospace;font-size:12px;resize:vertical"></textarea>
+      </div>
+      <button onclick="parseJsonPaste()" style="background:#edf2f7;border:none;border-radius:6px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:inherit">✓ 解析 JSON</button>
+      <div id="pastePreview" style="display:none;background:#f7fafc;border-radius:8px;padding:12px;margin-top:8px;font-size:13px;color:#4a5568"></div>
+    </div>
+    <div id="importPreviewBox" style="display:none;border:2px solid var(--green);border-radius:10px;padding:16px;margin:16px 0;background:#f0fff4">
+      <div style="font-size:13px;font-weight:700;color:#276749;margin-bottom:10px">✓ 解析成功，確認後上傳：</div>
+      <div id="importPreviewContent"></div>
+    </div>
+    <button class="gen-btn" id="importBtn" onclick="uploadLesson()" style="display:none;background:var(--green)">
+      <span>⬆</span> 上傳到雲端資料庫
+    </button>
+    <div class="status-box" id="importStatusBox"></div>
+  </div>
+</div>
+
+<!-- 設定 -->
+<div class="page" id="page-settings">
+  <div class="page-header">
+    <h2>⚙️ 連線設定</h2>
+    <p>設定 GitHub 資訊以連接雲端教案資料庫</p>
+  </div>
+  <div class="settings-card">
+    <h3>GitHub 設定</h3>
+    <p>教案資料庫存放在您的 GitHub Repository，需要以下資訊才能讀取和更新。</p>
+    <div class="form-group">
+      <label>GitHub 使用者名稱</label>
+      <input class="form-control" id="cfgOwner" placeholder="your-github-username">
+    </div>
+    <div class="form-group">
+      <label>Repository 名稱</label>
+      <input class="form-control" id="cfgRepo" placeholder="physics-lesson-db">
+    </div>
+    <div class="form-group">
+      <label>Personal Access Token（PAT）</label>
+      <input class="form-control" id="cfgToken" type="password" placeholder="ghp_xxxxxxxxxxxx">
+      <p class="hint">在 <a href="https://github.com/settings/tokens/new" target="_blank">GitHub → Settings → Personal access tokens</a> 建立，勾選 <strong>repo</strong> 權限即可。Token 僅存於您的瀏覽器，不會傳送至任何伺服器。</p>
+    </div>
+    <button class="save-btn" onclick="saveSettings()">儲存並測試連線</button>
+    <div id="settingsStatus" style="margin-top:14px;font-size:14px"></div>
+  </div>
+  <div class="settings-card" style="margin-top:20px">
+    <h3>部署說明</h3>
+    <p>首次使用請依照 SETUP.md 完成以下步驟：</p>
+    <ol style="margin-left:20px;line-height:2;font-size:14px;color:#4a5568">
+      <li>建立 Public GitHub Repository 並上傳 index.html 和 db/lessons.json</li>
+      <li>Repository → Settings → Pages → 開啟 GitHub Pages（main / root）</li>
+      <li>建立 PAT（只需勾選 repo）→ 填入上方設定</li>
+    </ol>
+  </div>
+</div>
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">教案詳情</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-tabs" id="modalTabs"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<script>
+// ── 設定 ──────────────────────────────────────────────────────────────────
+function loadSettings(){
+  return{owner:localStorage.getItem('gh_owner')||'',repo:localStorage.getItem('gh_repo')||'',token:localStorage.getItem('gh_token')||''};
+}
+function saveSettings(){
+  const owner=document.getElementById('cfgOwner').value.trim();
+  const repo=document.getElementById('cfgRepo').value.trim();
+  const token=document.getElementById('cfgToken').value.trim();
+  if(!owner||!repo||!token){alert('請填寫所有欄位');return;}
+  localStorage.setItem('gh_owner',owner);localStorage.setItem('gh_repo',repo);localStorage.setItem('gh_token',token);
+  document.getElementById('settingsStatus').innerHTML='<span style="color:#38a169">✓ 儲存成功，正在測試連線…</span>';
+  fetchLessons();
+}
+function loadSettingsUI(){
+  const s=loadSettings();
+  document.getElementById('cfgOwner').value=s.owner;
+  document.getElementById('cfgRepo').value=s.repo;
+  document.getElementById('cfgToken').value=s.token;
+}
+
+// ── 頁面切換 ───────────────────────────────────────────────────────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const idx=['db','import','settings'].indexOf(id);
+  if(idx>=0) document.querySelectorAll('.nav-link')[idx].classList.add('active');
+  if(id==='settings') loadSettingsUI();
+}
+
+// ── 讀取資料庫 ────────────────────────────────────────────────────────────
+let DB={lessons:[]};
+async function fetchLessons(){
+  const{owner,repo,token}=loadSettings();
+  if(!owner||!repo){updateNavStatus('未設定','');return;}
+  updateNavStatus('連線中…','');
+  try{
+    const headers=token?{'Authorization':`token ${token}`}:{};
+    const r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/db/lessons.json?t=${Date.now()}`,{headers,cache:'no-store'});
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    DB=await r.json();
+    renderLessons();
+    updateNavStatus(`✓ ${DB.lessons.length} 份教案`,'#38a169');
+    const ss=document.getElementById('settingsStatus');
+    if(ss.innerHTML.includes('連線')) ss.innerHTML=`<span style="color:#38a169">✓ 連線成功，已載入 ${DB.lessons.length} 份教案。</span>`;
+  }catch(e){
+    updateNavStatus('⚠ 連線失敗','#e53e3e');
+    const ss=document.getElementById('settingsStatus');
+    if(ss.innerHTML.includes('連線')) ss.innerHTML=`<span style="color:#e53e3e">✗ 連線失敗：${e.message}</span>`;
+  }
+}
+function updateNavStatus(text,color){
+  const el=document.getElementById('navStatus');el.textContent=text;el.style.color=color||'';
+}
+function renderLessons(){
+  const grid=document.getElementById('lessonGrid');
+  document.getElementById('emptyState').style.display=DB.lessons.length?'none':'block';
+  grid.querySelectorAll('.lesson-card').forEach(c=>c.remove());
+  DB.lessons.slice().reverse().forEach((l,i)=>{
+    const card=document.createElement('div');
+    card.className='lesson-card';
+    card.dataset.idx=DB.lessons.length-1-i;
+    card.innerHTML=`<span class="grade-tag">${l.meta.grade||''}</span><h3>${l.meta.title||l.meta.chapter||''}</h3><div class="chapter">📖 ${l.meta.chapter||''}</div>${l.meta.topic?`<div class="chapter">🌏 ${l.meta.topic}</div>`:''}<div class="date">🗓 ${(l.meta.created_at||'').slice(0,10)}</div>`;
+    card.onclick=()=>openModal(parseInt(card.dataset.idx));
+    grid.appendChild(card);
+  });
+}
+
+// ── 匯入教案 ──────────────────────────────────────────────────────────────
+let pendingLesson=null;
+function setImportMode(mode){
+  document.getElementById('importModeFile').style.display=mode==='file'?'block':'none';
+  document.getElementById('importModePaste').style.display=mode==='paste'?'block':'none';
+  const a='padding:9px 20px;font-size:13px;font-weight:700;background:var(--blue);color:#fff;border:none;cursor:pointer;font-family:inherit';
+  const b='padding:9px 20px;font-size:13px;font-weight:700;background:var(--white);color:var(--gray);border:none;cursor:pointer;font-family:inherit';
+  document.getElementById('modeFileBtn').style.cssText=mode==='file'?a:b;
+  document.getElementById('modePasteBtn').style.cssText=mode==='paste'?a:b;
+}
+function handleFileSelect(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{try{previewLesson(JSON.parse(ev.target.result),'filePreview');}catch(err){showPreviewError('filePreview',err);}};
+  reader.readAsText(file,'utf-8');
+}
+function parseJsonPaste(){
+  try{previewLesson(JSON.parse(document.getElementById('jsonPasteArea').value.trim()),'pastePreview');}
+  catch(err){showPreviewError('pastePreview',err);}
+}
+function showPreviewError(id,err){
+  const el=document.getElementById(id);el.style.display='block';
+  el.innerHTML=`<span style="color:var(--red)">✗ JSON 格式錯誤：${err.message}</span>`;
+}
+function previewLesson(lesson,previewId){
+  pendingLesson=lesson;
+  const m=lesson.meta||{};
+  const keys=['pbl','formal_plan','worksheet','reading_set','cross_subject_set','inquiry_set'];
+  const labels=['PBL教案','正式教案','學習單','閱讀題組','跨科題組','探究實作'];
+  const el=document.getElementById(previewId);
+  el.style.display='block';
+  el.innerHTML=`<strong>${m.grade||'—'}</strong>　${m.chapter||'—'}　<span style="color:var(--gray);font-size:12px">${m.topic||''}</span>`;
+  document.getElementById('importPreviewBox').style.display='block';
+  document.getElementById('importPreviewContent').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px;margin-bottom:10px">
+      <div><span style="font-size:11px;color:#718096">年段</span><br><strong>${m.grade||'—'}</strong></div>
+      <div><span style="font-size:11px;color:#718096">章節</span><br><strong>${m.chapter||'—'}</strong></div>
+      <div><span style="font-size:11px;color:#718096">時事</span><br><strong>${m.topic||'未設定'}</strong></div>
+      <div><span style="font-size:11px;color:#718096">標題</span><br><strong>${m.title||'—'}</strong></div>
+    </div>
+    <div style="font-size:13px">${keys.map((k,i)=>`<span style="margin-right:10px;color:${lesson[k]?'#276749':'#a0aec0'}">${lesson[k]?'✓':'✗'} ${labels[i]}</span>`).join('')}</div>`;
+  document.getElementById('importBtn').style.display='flex';
+}
+async function uploadLesson(){
+  if(!pendingLesson){alert('請先選擇 JSON');return;}
+  const{owner,repo,token}=loadSettings();
+  if(!token){alert('請先到「設定」填入 GitHub Token');showPage('settings');return;}
+  const btn=document.getElementById('importBtn');btn.disabled=true;
+  setImportStatus('running','<span class="spinner"></span> 正在上傳到 GitHub…');
+  try{
+    const getR=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/db/lessons.json`,{headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github+json'}});
+    if(!getR.ok) throw new Error(`無法讀取 lessons.json（HTTP ${getR.status}）。請確認 Repository 名稱、Token 正確，且 db/lessons.json 已建立。`);
+    const fileData=await getR.json();
+    const db=JSON.parse(atob(fileData.content.replace(/\n/g,'')));
+    const idx=db.lessons.findIndex(l=>l.meta?.chapter===pendingLesson.meta?.chapter);
+    if(idx>=0) db.lessons[idx]=pendingLesson; else db.lessons.push(pendingLesson);
+    db.updated_at=new Date().toISOString();
+    const putR=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/db/lessons.json`,{
+      method:'PUT',headers:{'Authorization':`token ${token}`,'Content-Type':'application/json','Accept':'application/vnd.github+json'},
+      body:JSON.stringify({message:`📚 匯入教案：${pendingLesson.meta?.grade} ${pendingLesson.meta?.chapter}`,content:btoa(unescape(encodeURIComponent(JSON.stringify(db,null,2)))),sha:fileData.sha})
+    });
+    if(!putR.ok){const e=await putR.json();throw new Error(e.message||`HTTP ${putR.status}`);}
+    setImportStatus('success','✓ 上傳成功！<button onclick="showPage(\'db\');fetchLessons()" style="margin-left:12px;background:var(--green);color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px">→ 查看資料庫</button>');
+    pendingLesson=null;document.getElementById('importPreviewBox').style.display='none';btn.style.display='none';
+    fetchLessons();
+  }catch(e){setImportStatus('error',`✗ 上傳失敗：${e.message}`);}
+  btn.disabled=false;
+}
+function setImportStatus(type,html){const box=document.getElementById('importStatusBox');box.className='status-box '+type;box.innerHTML=html;}
+
+// ── Modal ─────────────────────────────────────────────────────────────────
+const TAB_DEFS=[{id:'pbl',label:'🌏 PBL教案'},{id:'plan',label:'📄 正式教案'},{id:'ws',label:'📝 學習單'},{id:'reading',label:'🎯 閱讀題組'},{id:'cross',label:'🔬 跨科題組'},{id:'inquiry',label:'🧪 探究實作'}];
+let currentLesson=null,currentTab='pbl';
+function openModal(idx){currentLesson=DB.lessons[idx];currentTab='pbl';document.getElementById('modalTitle').textContent=currentLesson.meta.title||currentLesson.meta.chapter;renderModalTabs();renderModalContent();document.getElementById('modalOverlay').classList.add('open');}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+function renderModalTabs(){document.getElementById('modalTabs').innerHTML=TAB_DEFS.map(t=>`<button class="m-tab${t.id===currentTab?' active':''}" onclick="switchModalTab('${t.id}')">${t.label}</button>`).join('');}
+function switchModalTab(id){currentTab=id;renderModalTabs();renderModalContent();}
+function renderModalContent(){
+  const L=currentLesson,body=document.getElementById('modalBody'),footer=document.getElementById('modalFooter');
+  footer.innerHTML=`<button class="dl-btn outline" onclick="downloadAll()">⬇ 下載全部</button>`;
+  switch(currentTab){
+    case 'pbl':body.innerHTML=renderPBL(L);break;
+    case 'plan':body.innerHTML=renderPlan(L);break;
+    case 'ws':body.innerHTML=renderWorksheet(L);break;
+    case 'reading':body.innerHTML=renderQSet(L.reading_set,'🎯 學測閱讀題組');footer.innerHTML+=`<button class="dl-btn blue" onclick="dlSet('reading')">⬇ 下載</button>`;break;
+    case 'cross':body.innerHTML=renderQSet(L.cross_subject_set,'🔬 跨科整合題組');footer.innerHTML+=`<button class="dl-btn red" onclick="dlSet('cross')">⬇ 下載</button>`;break;
+    case 'inquiry':body.innerHTML=renderInquiry(L.inquiry_set);footer.innerHTML+=`<button class="dl-btn orange" onclick="dlSet('inquiry')">⬇ 下載</button>`;break;
+  }
+  body.querySelectorAll('.answer-btn').forEach(btn=>{btn.onclick=function(){const box=this.nextElementSibling;const show=box.style.display==='block';box.style.display=show?'none':'block';this.textContent=show?'顯示答案與詳解':'隱藏答案';};});
+  body.querySelectorAll('.session-header').forEach(h=>{h.onclick=function(){this.nextElementSibling.classList.toggle('open');};});
+}
+
+function renderPBL(L){
+  const p=L.pbl||{};
+  const sessions=(p.sessions||[]).map((s,i)=>`<div class="session-box"><div class="session-header"><div class="session-num">${s.session||i+1}</div><div class="session-title">${s.title||''}</div><div class="session-time">${s.duration||45}分鐘</div></div><div class="session-body${i===0?' open':''}"><ul>${(s.activities||[]).map(a=>`<li>${a}</li>`).join('')}</ul>${s.assessment?`<p style="margin-top:8px;font-size:13px;color:#718096"><strong>評量：</strong>${s.assessment}</p>`:''}</div></div>`).join('');
+  return`<div class="section-title">🌏 時事 PBL 教案</div><div style="background:#ebf8ff;border-left:5px solid #3182ce;border-radius:8px;padding:16px;margin-bottom:16px"><div style="font-size:11px;font-weight:700;color:#2b6cb0;margin-bottom:6px">🎯 核心驅動問題</div><div style="font-size:17px;font-weight:700;color:#1a365d;line-height:1.5">${p.driving_question||''}</div></div>${p.news_summary?`<div style="background:#f7fafc;border-radius:8px;padding:14px;margin-bottom:16px;font-size:14px;color:#4a5568;line-height:1.8"><strong>🌏 時事：</strong>${p.news_summary}</div>`:''}<strong style="font-size:14px">學習目標</strong><ul style="margin:8px 0 16px 18px;line-height:2;color:#4a5568;font-size:14px">${(p.objectives||[]).map(o=>`<li>${o}</li>`).join('')}</ul><strong style="font-size:14px">📅 四節課教學流程</strong><div style="margin-top:10px">${sessions}</div>`;
+}
+
+function renderPlan(L){
+  const p=L.formal_plan||{};
+  const flow=(p.flow||[]).map(f=>`<tr><td style="font-weight:600;color:#2b6cb0;text-align:center;background:#ebf8ff;width:80px">${f.session||''}</td><td style="font-size:13px;line-height:1.7">${f.content||''}</td><td style="text-align:center;color:#718096;width:60px">${f.time||45}分</td><td style="font-size:13px;width:140px">${f.assessment||''}</td></tr>`).join('');
+  return`<div class="section-title">📄 正式教案</div><div class="info-grid"><div class="info-item"><div class="label">主題</div><div class="value">${p.subject_name||''}</div></div><div class="info-item"><div class="label">年段</div><div class="value">${p.grade_level||''}</div></div><div class="info-item"><div class="label">來源</div><div class="value">${p.source||''}</div></div><div class="info-item"><div class="label">時數</div><div class="value">${p.hours||''}</div></div></div><div class="tag-row">${(p.core_competencies||[]).map(c=>`<span class="tag">${c}</span>`).join('')}</div><ul style="margin:8px 0 16px 18px;font-size:13px;line-height:1.8;color:#4a5568">${(p.objectives||[]).map(x=>`<li>${x}</li>`).join('')}</ul><div style="overflow-x:auto;margin-top:8px"><table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="background:#2b6cb0;color:#fff"><th style="padding:8px;text-align:center">節次</th><th style="padding:8px;text-align:left">教學活動</th><th style="padding:8px;text-align:center">時間</th><th style="padding:8px;text-align:left">評量</th></tr>${flow}</table></div>`;
+}
+
+function renderWorksheet(L){
+  const w=L.worksheet||{};
+  const p1=(w.part1||[]).map((q,i)=>`<div style="margin:12px 0;padding:12px;border:1px solid var(--border);border-radius:8px"><strong style="color:var(--blue)">Q${i+1}.</strong><p style="font-size:14px;margin:4px 0">${q.q||''}</p><div style="border-bottom:1px solid #cbd5e0;margin:10px 0;height:24px"></div></div>`).join('');
+  const p3=(w.part3||[]).map((q,i)=>`<div style="margin:12px 0;padding:12px;border:1px solid var(--border);border-radius:8px"><strong style="color:var(--green)">R${i+1}.</strong><p style="font-size:14px;margin:4px 0">${q.q||''}</p><div style="border-bottom:1px solid #cbd5e0;margin:10px 0;height:24px"></div></div>`).join('');
+  const hdrs=(w.part2_table?.headers||['變因','測量值1','測量值2','平均值']).map(h=>`<th style="background:#edf2f7;padding:8px;border:1px solid var(--border)">${h}</th>`).join('');
+  const rows=Array(w.part2_table?.rows||4).fill(0).map(()=>`<tr>${(w.part2_table?.headers||['','','','']).map(()=>`<td style="border:1px solid var(--border);height:36px"></td>`).join('')}</tr>`).join('');
+  return`<div class="section-title">📝 學習單</div><div style="text-align:center;border-bottom:2px solid var(--blue);padding-bottom:14px;margin-bottom:20px;font-size:11px;color:#718096">年班：_______ 座號：_______ 姓名：_______ 日期：_______</div><strong style="font-size:14px;color:var(--blue)">Part 1｜課前預習</strong><div style="margin-top:8px">${p1}</div><strong style="font-size:14px;color:var(--blue)">Part 2｜課中記錄</strong><div style="overflow-x:auto;margin:10px 0"><table style="width:100%;border-collapse:collapse"><tr>${hdrs}</tr>${rows}</table></div><strong style="font-size:14px;color:var(--green)">Part 3｜課後反思</strong><div style="margin-top:8px">${p3}</div>`;
+}
+
+function renderQSet(qs,title){
+  if(!qs) return`<p style="color:#718096">尚無資料</p>`;
+  const qs_arr=(qs.questions||[]).map((q,i)=>{
+    const tc=q.type==='單選'?'single':q.type==='多選'?'multi':'open';
+    const choices=(q.choices||[]).map(c=>`<div class="choice"><strong>${c.slice(0,3)}</strong>${c.slice(3)}</div>`).join('');
+    return`<div class="question-block ${tc}"><div class="q-type-tag ${tc}">【${q.type}題】第${i+1}題${q.tag?` ｜ ${q.tag}`:''}</div><div class="q-subject">${q.q||''}</div>${choices?`<div class="choices">${choices}</div>`:''}<button class="answer-btn">顯示答案與詳解</button><div class="answer-box"><strong>答案：${q.answer||''}</strong><br>${q.explanation||''}</div></div>`;
+  }).join('');
+  const tbl=qs.data_table;
+  const tblHtml=tbl?`<div style="overflow-x:auto;margin:12px 0"><table class="data-table"><caption style="font-size:13px;color:#718096;margin-bottom:6px">${tbl.caption||''}</caption><tr>${(tbl.headers||[]).map(h=>`<th>${h}</th>`).join('')}</tr>${(tbl.rows||[]).map(r=>`<tr>${(Array.isArray(r)?r:[r]).map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>`:'';
+  const src=(qs.sources||[]).map((s,i)=>`<div class="source-item">[${i+1}] ${s.title}（${s.org}，${s.year}）— <a href="${s.url||'#'}" target="_blank">${s.url||''}</a></div>`).join('');
+  return`<div class="section-title">${title}</div><div style="background:#f7fafc;border-radius:8px;padding:16px;margin-bottom:16px;font-size:14px;line-height:1.9"><strong>${qs.passage_title||''}</strong><br>${(qs.passage||'').replace(/\n/g,'<br>')}</div>${tblHtml}<div style="margin-top:16px">${qs_arr}</div>${src?`<div class="sources-list"><h4>📚 資料來源</h4>${src}</div>`:''}`;
+}
+
+function renderInquiry(qs){
+  if(!qs) return`<p style="color:#718096">尚無資料</p>`;
+  const mkQ=(arr,tc)=>(arr||[]).map((q,i)=>{const choices=(q.choices||[]).map(c=>`<div class="choice"><strong>${c.slice(0,3)}</strong>${c.slice(3)}</div>`).join('');return`<div class="question-block ${tc}"><div class="q-type-tag ${tc}">【${q.type}題】${q.tag||''}</div><div class="q-subject">${q.q||''}</div><div class="choices">${choices}</div><button class="answer-btn">顯示答案</button><div class="answer-box"><strong>答案：${q.answer||''}</strong><br>${q.explanation||''}</div></div>`;}).join('');
+  const q3=qs.q3_mixed||{};
+  const tbl=qs.data_table;
+  const tblHtml=tbl?`<div style="overflow-x:auto;margin:12px 0"><table class="data-table"><caption style="font-size:13px;color:#718096;margin-bottom:6px">${tbl.caption||''}</caption><tr>${(tbl.headers||[]).map(h=>`<th>${h}</th>`).join('')}</tr>${(tbl.rows||[]).map(r=>`<tr>${(Array.isArray(r)?r:[r]).map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>`:'';
+  const src=(qs.sources||[]).map((s,i)=>`<div class="source-item">[${i+1}] ${s.title}（${s.org}，${s.year}）— <a href="${s.url||'#'}" target="_blank">${s.url||''}</a></div>`).join('');
+  const mkOpen=(label,q,ans)=>`<div class="question-block open" style="margin-top:8px"><div class="q-subject"><strong>${label}</strong> ${q||''}</div><button class="answer-btn">顯示答案</button><div class="answer-box"><strong>參考答案：</strong>${ans||''}</div></div>`;
+  return`<div class="section-title">🧪 探究實作題組</div><div class="inquiry-flow"><strong>${qs.scenario_title||''}</strong><br>${(qs.scenario||'').replace(/\n/g,'<br>')}</div>${tblHtml}<strong style="font-size:14px;color:var(--blue);margin-top:16px;display:block">第一大題｜科學探究能力</strong>${mkQ(qs.q1_inquiry,'single')}<strong style="font-size:14px;color:var(--red);margin-top:16px;display:block">第二大題｜資料分析與詮釋</strong>${mkQ(qs.q2_analysis,'multi')}<strong style="font-size:14px;color:var(--green);margin-top:16px;display:block">第三大題｜混合非選擇題</strong>${mkOpen('(a)',q3.qa,q3.qa_answer)}${mkOpen('(b)',q3.qb,q3.qb_answer)}${mkOpen('(c)',q3.qc,q3.qc_answer)}${src?`<div class="sources-list"><h4>📚 資料來源</h4>${src}</div>`:''}`;
+}
+
+// ── 下載 ──────────────────────────────────────────────────────────────────
+function dlBlob(filename,text){const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(text);a.download=filename;a.click();}
+function dlSet(type){
+  if(!currentLesson)return;
+  const s={reading:currentLesson.reading_set,cross:currentLesson.cross_subject_set,inquiry:currentLesson.inquiry_set}[type]||{};
+  const lines=[s.passage_title||s.scenario_title||'','',s.passage||s.scenario||'',''];
+  const qs=[...((s.questions||[])).concat(s.q1_inquiry||[]).concat(s.q2_analysis||[])];
+  qs.forEach((q,i)=>{lines.push(`【${q.type}題】第${i+1}題`);lines.push(q.q||'');(q.choices||[]).forEach(c=>lines.push(c));lines.push(`答案：${q.answer||''}`);lines.push(q.explanation||'');lines.push('');});
+  if(s.q3_mixed){const q=s.q3_mixed;['qa','qb','qc'].forEach(k=>{lines.push(`(${k.slice(1)}) ${q[k]||''}`);lines.push(`答案：${q[k+'_answer']||''}`);lines.push('');});}
+  (s.sources||[]).forEach((x,i)=>lines.push(`[${i+1}] ${x.title}（${x.org}，${x.year}）— ${x.url||''}`));
+  dlBlob(`${currentLesson.meta.chapter}_${type}.txt`,lines.join('\n'));
+}
+function downloadAll(){
+  if(!currentLesson)return;
+  const L=currentLesson,m=L.meta||{};
+  let t=`高中物理世界脈動 — 完整教案包\n${'='.repeat(50)}\n年段：${m.grade}\n章節：${m.chapter}\n時事：${m.topic}\n標題：${m.title}\n日期：${m.created_at}\n\n`;
+  t+=`【PBL驅動問題】\n${L.pbl?.driving_question||''}\n\n【教學目標】\n`;
+  (L.pbl?.objectives||[]).forEach((o,i)=>t+=`${i+1}. ${o}\n`);
+  t+='\n【教學流程】\n';
+  (L.formal_plan?.flow||[]).forEach(f=>t+=`${f.session}（${f.time}分）：${f.content}\n`);
+  t+='\n（完整題組請從各 Tab 個別下載）\n';
+  dlBlob(`${m.chapter}_教案全包.txt`,t);
+}
+
+// ── 初始化 ────────────────────────────────────────────────────────────────
+(function init(){
+  const s=loadSettings();
+  if(s.owner&&s.repo) fetchLessons();
+  else updateNavStatus('請先設定','');
+})();
+</script>
+</body>
+</html>
