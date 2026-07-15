@@ -273,8 +273,8 @@ async function fetchLessons(){
   if(!owner||!repo){updateNavStatus('未設定','');return;}
   updateNavStatus('連線中…','');
   try{
-    const headers=token?{'Authorization':`token ${token}`}:{};
-    const r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/db/lessons.json?t=${Date.now()}`,{headers,cache:'no-store'});
+    // 讀取公開 raw URL 不帶 Authorization，避免 CORS preflight 被攔截
+    const r=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/db/lessons.json?t=${Date.now()}`,{cache:'no-store'});
     if(!r.ok) throw new Error(`HTTP ${r.status}`);
     DB=await r.json();
     renderLessons();
@@ -472,5 +472,4 @@ function downloadAll(){
   else updateNavStatus('請先設定','');
 })();
 </script>
-</body>
-</html>
+</bo
